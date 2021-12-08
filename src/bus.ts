@@ -22,7 +22,7 @@ export class EventBus {
     this.idGenerator = idGenerator;
   }
 
-  publish(queue: Queue, message: Message) {
+  publish<T>(queue: Queue, message: Omit<Message<T>, "id">) {
     this.subcriptions.every((sub) => {
       if (sub.queue === queue) {
         sub.callback(message);

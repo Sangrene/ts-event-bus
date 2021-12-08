@@ -13,7 +13,7 @@ describe("Event bus", () => {
 
     bus.subscribe<{ truc: string }>({ queue: "queue", callback: spiedCallback });
 
-    bus.publish("notqueue", { truc: "truc" });
+    bus.publish<{truc: string}>("notqueue", { truc: "truc" });
 
     expect(spiedCallback).to.not.have.been.called.once;
   });
