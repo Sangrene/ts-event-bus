@@ -1,7 +1,6 @@
 {
-  "name": "ts-event-bus",
+  "name": "@sangrene/ts-event-bus",
   "version": "1.0.0",
-  "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -48,5 +47,18 @@
     "reporter": [
       "text"
     ]
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sangrene/ts-event-bus.git"
+  },
+  "keywords": [
+    "event",
+    "bus"
+  ],
+  "bugs": {
+    "url": "https://github.com/Sangrene/ts-event-bus/issues"
+  },
+  "homepage": "https://github.com/Sangrene/ts-event-bus#readme",
+  "description": "Simple TS event bus"
 }
