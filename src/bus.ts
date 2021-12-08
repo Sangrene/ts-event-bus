@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid";
-
 type Queue = string;
 
 export type Message<T = any> = {
@@ -14,8 +12,15 @@ export type Subscription<T> = {
 
 export type Callback<T> = (message: Message<T>) => void;
 
+export type IdGenerator = () => string;
+
 export class EventBus {
   private subcriptions: Subscription<any>[] = [];
+  private idGenerator: IdGenerator;
+
+  constructor(idGenerator: () => string) {
+    this.idGenerator = idGenerator;
+  }
 
   publish(queue: Queue, message: Message) {
     this.subcriptions.every((sub) => {
@@ -26,7 +31,7 @@ export class EventBus {
   }
 
   subscribe<T = any>(subscription: Omit<Subscription<T>, "id">) {
-    const id = nanoid();
+    const id = this.idGenerator();
     this.subcriptions.push({ ...subscription, id });
     return {
       unsubscribe: () => {
@@ -35,4 +40,3 @@ export class EventBus {
     };
   }
 }
-
