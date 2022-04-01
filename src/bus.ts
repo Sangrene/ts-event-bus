@@ -8,13 +8,14 @@ export type Subscription<T> = {
   callback: Callback<T>;
 };
 
-export type Callback<T> = (message: Message<T>, id: string) => void;
+export type Callback<T> = (message: Message<T>, id?: string) => void;
 
 export type IdGenerator = () => string;
 
 export class MessageTimeoutError extends Error {
-  constructor() {
+  constructor(message?: Message) {
     super("Message timeout error");
+    this.message = `Message timeout error on message ${message}`;
   }
 }
 export class EventBus {
@@ -39,7 +40,6 @@ export class EventBus {
     return {
       unsubscribe: () => {
         this.subcriptions = this.subcriptions.filter((sub) => sub.id !== id);
-        console.log("unsubscribed from", subscription.queue);
       },
     };
   }
