@@ -8,7 +8,8 @@ module.exports = {
     filename: "index.js",
     path: path.resolve(__dirname, 'dist'),
     library: "ts-event-bus",
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: "this",
   },
   resolve: {
     extensions: [".ts", ".js"]
