@@ -24,7 +24,7 @@ const callback: Callback<MessagePayload> = (message) => {
 
 bus.subscribe<MessagePayload>({ queue: "queue", callback });
 
-bus.publish<MessagePayload>("queue", { a: "a", b: 1 });
+bus.publish<MessagePayload>({ queue: "queue", { a: "a", b: 1 } });
 ```
 
 Waiting for a response:
