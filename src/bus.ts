@@ -8,7 +8,7 @@ export type Subscription<T> = {
   callback: Callback<T>;
 };
 
-export type Callback<T> = (message: Message<T>, id?: string) => void;
+export type Callback<T> = (message: Message<T>, id?: string) => void | Promise<void>;
 
 export type IdGenerator = () => string;
 
@@ -26,8 +26,8 @@ export class EventBus {
     this.idGenerator = idGenerator;
   }
 
-  publish<T>({ queue, message, id }: { queue: Queue; message: Message<T>; id?: string }) {
-    this.subcriptions.forEach((sub) => {
+  async publish<T>({ queue, message, id }: { queue: Queue; message: Message<T>; id?: string }) {
+    this.subcriptions.forEach(async (sub) => {
       if (sub.queue === queue) {
         sub.callback(message, id);
       }

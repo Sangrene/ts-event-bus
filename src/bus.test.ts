@@ -73,4 +73,28 @@ describe("Event bus", () => {
       }),
     ).to.be.rejectedWith(MessageTimeoutError);
   });
+
+  it("Can handle Promise response", async () => {
+    const bus = new EventBus(idGenerator);
+    const responseQueueName = "event-response";
+    bus.subscribe({
+      queue: "event-request",
+      callback: (msg, id) => {
+        return new Promise((req, rej) => {
+          const timeoutId = setTimeout(() => {
+            bus.publish({ queue: responseQueueName, message: { truc: "response" }, id });
+            req();
+            clearTimeout(timeoutId);
+          }, 1000);
+        });
+      },
+    });
+    const result = await bus.publishAndWaitForResponse({
+      queue: "event-request",
+      responseQueue: responseQueueName,
+      message: { truc: "request" },
+      timeout: 2000,
+    });
+    expect(result).to.deep.equal({ truc: "response" });
+  });
 });
