@@ -1,6 +1,6 @@
 {
   "name": "ts-simple-event-bus",
-  "version": "2.0.0",
+  "version": "2.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -8,8 +8,7 @@
     "build:typescript": "tsc",
     "test:watch": "nyc mocha -r ts-node/register --watch --watch-files src, src/**/**/*.test.ts",
     "test": "nyc mocha -r ts-node/register **/**/*.test.ts",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "publish": "yarn build && npm publish"
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Hugo LAPLACE-BUILHE",
   "license": "ISC",

@@ -1,5 +1,3 @@
-type Queue = string;
-
 export type Message<T = any> = T;
 
 export type Subscription<T> = {
