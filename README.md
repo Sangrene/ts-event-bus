@@ -35,10 +35,12 @@ Waiting for a response:
 
 ```typescript
 type EventBusTyping = {
-  queue: {
-    a: string;
-    b: number;
-  }
+  "event-response": {
+    event: string,
+  },
+  "event-request": {
+    event: string,
+  },
 };
 const bus = new EventBus<EventBusTyping>(idGenerator);
 const responseQueueName = "event-response";
