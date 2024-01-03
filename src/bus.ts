@@ -4,7 +4,7 @@ export type Message<T = any> = T;
 
 export type Subscription<T> = {
   id: string;
-  queue: Queue;
+  queue: keyof T;
   callback: Callback<T>;
 };
 
@@ -18,7 +18,8 @@ export class MessageTimeoutError extends Error {
     this.message = `Message timeout error on message ${message}`;
   }
 }
-export class EventBus {
+
+export class EventBus<T> {
   private subcriptions: Subscription<any>[] = [];
   private idGenerator: IdGenerator;
 
@@ -26,7 +27,7 @@ export class EventBus {
     this.idGenerator = idGenerator;
   }
 
-  async publish<T>({ queue, message, id }: { queue: Queue; message: Message<T>; id?: string }) {
+  async publish<Q extends keyof T>({ queue, message, id }: { queue: Q; message: T[Q]; id?: string }) {
     this.subcriptions.forEach(async (sub) => {
       if (sub.queue === queue) {
         sub.callback(message, id);
@@ -34,9 +35,15 @@ export class EventBus {
     });
   }
 
-  subscribe<T = any>(subscription: Omit<Subscription<T>, "id">) {
+  subscribe<Q extends keyof T>({
+    queue,
+    callback,
+  }: {
+    queue: Q;
+    callback: (message: T[Q] & { id?: string }, id?: string) => void | Promise<void>;
+  }) {
     const id = this.idGenerator();
-    this.subcriptions.push({ ...subscription, id });
+    this.subcriptions.push({ queue, callback, id });
     return {
       unsubscribe: () => {
         this.subcriptions = this.subcriptions.filter((sub) => sub.id !== id);
@@ -44,24 +51,24 @@ export class EventBus {
     };
   }
 
-  publishAndWaitForResponse<Req, Rep>({
+  publishAndWaitForResponse<Q extends keyof T, RQ extends keyof T>({
     message,
     queue,
     responseQueue,
     timeout = 5000,
   }: {
-    queue: Queue;
-    responseQueue: string;
-    message: Message<Req>;
+    queue: Q;
+    responseQueue: RQ;
+    message: T[Q] & { id?: string };
     timeout?: number;
-  }): Promise<Rep> {
+  }): Promise<T[RQ]> {
     return new Promise((res, rej) => {
       const msgId = this.idGenerator();
       const timeoutId = setTimeout(() => {
         rej(new MessageTimeoutError());
       }, timeout);
 
-      this.subscribe<Rep>({
+      this.subscribe({
         queue: responseQueue,
         callback: (handledMessage, id) => {
           if (id === msgId) {
@@ -71,7 +78,7 @@ export class EventBus {
         },
       });
 
-      this.publish<Req>({ queue, message, id: msgId });
+      this.publish({ queue, message, id: msgId });
     });
   }
 }

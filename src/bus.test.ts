@@ -10,22 +10,33 @@ const expect = chai.expect;
 describe("Event bus", () => {
   const idGenerator = nanoid;
   it("Doesn't receive a message published to channel not subscribed to", () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      queue: {
+        truc: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     const callback: Callback<{ truc: string }> = (message) => {};
     const spiedCallback = chai.spy(callback);
 
-    bus.subscribe<{ truc: string }>({ queue: "queue", callback: spiedCallback });
+    bus.subscribe({ queue: "queue", callback: spiedCallback });
 
-    bus.publish<{ truc: string }>({ queue: "notqueue", message: { truc: "truc" } });
+    //@ts-expect-error
+    bus.publish({ queue: "notqueue", message: { truc: "truc" } });
 
     expect(spiedCallback).to.not.have.been.called.once;
   });
   it("Receives the message published to a channel which is subscribed to", () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      queue: {
+        truc: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     const callback: Callback<{ truc: string }> = (message) => {};
     const spiedCallback = chai.spy(callback);
 
-    bus.subscribe<{ truc: string }>({ queue: "queue", callback: spiedCallback });
+    bus.subscribe({ queue: "queue", callback: spiedCallback });
 
     bus.publish({ queue: "queue", message: { truc: "truc" } });
 
@@ -33,11 +44,16 @@ describe("Event bus", () => {
   });
 
   it("Can unsubscribe to a channel", () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      queue: {
+        truc: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     const callback: Callback<{ truc: string }> = (message) => {};
     const spiedCallback = chai.spy(callback);
 
-    const { unsubscribe } = bus.subscribe<{ truc: string }>({ queue: "queue", callback: spiedCallback });
+    const { unsubscribe } = bus.subscribe({ queue: "queue", callback: spiedCallback });
     unsubscribe();
     bus.publish({ queue: "queue", message: { truc: "truc" } });
 
@@ -45,7 +61,15 @@ describe("Event bus", () => {
   });
 
   it("Can publish and wait for response", async () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      "event-request": {
+        truc: string;
+      };
+      "event-response": {
+        truc: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     const responseQueueName = "event-response";
     bus.subscribe({
       queue: "event-request",
@@ -63,7 +87,15 @@ describe("Event bus", () => {
   });
 
   it("Will throw MessageTimeoutError if publishAndWaitForResponse does not complete in time", async () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      "event-request": {
+        truc: string;
+      };
+      "event-response": {
+        truc: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     await expect(
       bus.publishAndWaitForResponse({
         queue: "event-request",
@@ -75,14 +107,22 @@ describe("Event bus", () => {
   });
 
   it("Can handle Promise response", async () => {
-    const bus = new EventBus(idGenerator);
+    type BusType = {
+      "event-request": {
+        truc: string;
+      };
+      "event-response": {
+        trac: string;
+      };
+    };
+    const bus = new EventBus<BusType>(idGenerator);
     const responseQueueName = "event-response";
     bus.subscribe({
       queue: "event-request",
       callback: (msg, id) => {
         return new Promise((req, rej) => {
           const timeoutId = setTimeout(() => {
-            bus.publish({ queue: responseQueueName, message: { truc: "response" }, id });
+            bus.publish({ queue: responseQueueName, message: { trac: "response" }, id });
             req();
             clearTimeout(timeoutId);
           }, 1000);
@@ -95,6 +135,6 @@ describe("Event bus", () => {
       message: { truc: "request" },
       timeout: 2000,
     });
-    expect(result).to.deep.equal({ truc: "response" });
+    expect(result).to.deep.equal({ trac: "response" });
   });
 });
