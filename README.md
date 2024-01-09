@@ -1,4 +1,5 @@
 # TS-simple-event-bus
+![npm](https://img.shields.io/npm/v/ts-simple-event-bus)
 
 A simple event bus that implements a pub / sub pattern. Fully typed.
 
